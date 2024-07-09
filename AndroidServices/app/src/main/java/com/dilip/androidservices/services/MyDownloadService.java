@@ -3,13 +3,16 @@ package com.dilip.androidservices.services;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 
+import com.dilip.androidservices.DownloadThread;
 import com.dilip.androidservices.MainActivity;
 
 public class MyDownloadService extends Service {
 
     private static final String TAG = "MyTag";
+    private DownloadThread mDownloaderThread;
 
     // this is started service
     public MyDownloadService() {
@@ -19,6 +22,12 @@ public class MyDownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate: called");
+        mDownloaderThread = new DownloadThread();
+        mDownloaderThread.start();
+
+        while (mDownloaderThread.mHandler == null) {
+
+        }
     }
 
     @Override
@@ -27,13 +36,9 @@ public class MyDownloadService extends Service {
         Log.d(TAG, "onStartCommand: called " + Thread.currentThread().getName());
         String songName = intent.getStringExtra(MainActivity.MESSAGE_KEY);
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                downloadSong(songName);
-            }
-        });
-        thread.start();
+        Message message = Message.obtain();
+        message.obj = songName;
+        mDownloaderThread.mHandler.sendMessage(message);
 
         return Service.START_REDELIVER_INTENT;
     }
