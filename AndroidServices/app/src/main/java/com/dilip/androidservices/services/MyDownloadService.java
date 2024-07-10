@@ -2,17 +2,15 @@ package com.dilip.androidservices.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 
-import com.dilip.androidservices.DownloadThread;
 import com.dilip.androidservices.MainActivity;
 
 public class MyDownloadService extends Service {
 
     private static final String TAG = "MyTag";
-    private DownloadThread mDownloaderThread;
 
     // this is started service
     public MyDownloadService() {
@@ -22,12 +20,7 @@ public class MyDownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate: called");
-        mDownloaderThread = new DownloadThread();
-        mDownloaderThread.start();
 
-        while (mDownloaderThread.mHandler == null) {
-
-        }
     }
 
     @Override
@@ -35,11 +28,8 @@ public class MyDownloadService extends Service {
 
         Log.d(TAG, "onStartCommand: called " + Thread.currentThread().getName());
         String songName = intent.getStringExtra(MainActivity.MESSAGE_KEY);
-
-        Message message = Message.obtain();
-        message.obj = songName;
-        mDownloaderThread.mHandler.sendMessage(message);
-
+        MyDownloadTask myDownloadTask = new MyDownloadTask();
+        myDownloadTask.execute(songName);
         return Service.START_REDELIVER_INTENT;
     }
 
@@ -64,6 +54,33 @@ public class MyDownloadService extends Service {
         }
 
         Log.d(TAG, "downloadSong: " + songName + " Downloaded...");
+    }
+
+    class MyDownloadTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... songs) {
+            for (String song : songs) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                publishProgress(song);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            Log.d(TAG, "onProgressUpdate: Song Downloaded: " + values[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d(TAG, "onProgressUpdate: Result is:" + s);
+
+        }
     }
 
 }
