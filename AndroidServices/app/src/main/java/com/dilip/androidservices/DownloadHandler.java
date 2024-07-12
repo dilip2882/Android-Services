@@ -4,9 +4,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.dilip.androidservices.services.MyDownloadService;
+
 public class DownloadHandler extends Handler {
 
     private static final String TAG = "MyTag";
+    private MyDownloadService mDownloadService;
 
     public DownloadHandler() {
 
@@ -16,6 +19,10 @@ public class DownloadHandler extends Handler {
     public void handleMessage(Message msg) {
 
         downloadSong(msg.obj.toString());
+//        mDownloadService.stopSelf(msg.arg1);
+        boolean stopResult = mDownloadService.stopSelfResult(msg.arg1);
+        Log.d(TAG, "handleMessage: Service Stop: "+stopResult+ " startId: "+ msg.arg1);
+
     }
 
     private void downloadSong(final String songName) {
@@ -36,5 +43,9 @@ public class DownloadHandler extends Handler {
 
 
         Log.d(TAG, "downloadSong: " + songName + " Downloaded...");
+    }
+
+    public void setDownloadService(MyDownloadService mDownloadService) {
+        this.mDownloadService = mDownloadService;
     }
 }

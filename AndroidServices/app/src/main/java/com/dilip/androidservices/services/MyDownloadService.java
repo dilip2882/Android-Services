@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 
 import com.dilip.androidservices.MainActivity;
@@ -26,10 +27,17 @@ public class MyDownloadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.d(TAG, "onStartCommand: called " + Thread.currentThread().getName());
-        String songName = intent.getStringExtra(MainActivity.MESSAGE_KEY);
+        Log.d(TAG, "onStartCommand: called " + intent.getStringExtra(MainActivity.MESSAGE_KEY));  // this will cause null error if START_STICKY
+//        Log.d(TAG, "onStartCommand: called " + Thread.currentThread().getName());
+        final String songName = intent.getStringExtra(MainActivity.MESSAGE_KEY);
+
+        Message message = Message.obtain();
+        message.obj = songName;
+        message.arg1 = startId;
+
         MyDownloadTask myDownloadTask = new MyDownloadTask();
         myDownloadTask.execute(songName);
+
         return Service.START_REDELIVER_INTENT;
     }
 
