@@ -47,7 +47,7 @@ public class MyDownloadService extends Service {
         message.obj = songName;
         message.arg1 = startId;
 
-        downloadSong(songName);
+        mDownloadThread.mHandler.sendMessage(message);
 
         return Service.START_REDELIVER_INTENT;
     }
