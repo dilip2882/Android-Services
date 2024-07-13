@@ -15,5 +15,6 @@
     <string name="clear">CLEAR</string>
     <string name="run_code">RUN CODE</string>
     <string name="play">PLAY</string>
+    <string name="pause">Pause</string>
 
 </resources>

@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.dilip.musicplayerservice.services.MusicPlayerService;
-import com.dilip.musicplayerservice.services.MyDownloadService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,14 +50,13 @@ public class MainActivity extends AppCompatActivity {
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            String songName = intent.getStringExtra(MESSAGE_KEY);
+
             String result = intent.getStringExtra(MESSAGE_KEY);
 
             if (result == "done") {
-                mPlayButton.setText("Play");
+                mPlayButton.setText(R.string.play);
             }
 
-//            log(songName + " Downloaded...");
             Log.d(TAG, "onReceive: Thread Name: " + Thread.currentThread().getName());
         }
     };
@@ -110,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clearOutput(View v) {
-        Intent intent = new Intent(MainActivity.this, MyDownloadService.class);
+        Intent intent = new Intent(MainActivity.this, MusicPlayerService.class);
         stopService(intent);
 
         mLog.setText("");
@@ -139,10 +137,13 @@ public class MainActivity extends AppCompatActivity {
         if (mBound) {
             if (mMusicPlayerService.isPlaying()) {
                 mMusicPlayerService.pause();
-                mPlayButton.setText("Play");
+                mPlayButton.setText(R.string.play);
             } else {
+                Intent intent = new Intent(MainActivity.this, MusicPlayerService.class);
+                startService(intent);
+
                 mMusicPlayerService.play();
-                mPlayButton.setText("Pause");
+                mPlayButton.setText(R.string.pause);
             }
         }
     }
