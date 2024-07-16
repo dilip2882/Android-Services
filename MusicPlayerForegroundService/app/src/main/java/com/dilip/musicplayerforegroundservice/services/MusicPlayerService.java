@@ -1,8 +1,8 @@
 package com.dilip.musicplayerforegroundservice.services;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -17,6 +17,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.dilip.musicplayerforegroundservice.MainActivity;
 import com.dilip.musicplayerforegroundservice.R;
+import com.dilip.musicplayerforegroundservice.constants.Constants;
 
 public class MusicPlayerService extends Service {
 
@@ -51,6 +52,22 @@ public class MusicPlayerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        String action = intent.getAction();
+        if (action == null) {
+            Log.e(TAG, "onStartCommand: Intent is null");
+        } else if (action.equals(Constants.MUSIC_SERVICE_ACTION_PLAY)) {
+            play();
+        } else if (action.equals(Constants.MUSIC_SERVICE_ACTION_PAUSE)) {
+            pause();
+        } else if (action.equals(Constants.MUSIC_SERVICE_ACTION_STOP)) {
+            stopForeground(true);
+            stopSelf();
+        } else if (action.equals(Constants.MUSIC_SERVICE_ACTION_START)) {
+            showNotification();
+        } else {
+            stopSelf();
+        }
+
         showNotification();
 
         Log.d(TAG, "onStartCommand: ");
@@ -70,11 +87,32 @@ public class MusicPlayerService extends Service {
             notificationManager.createNotificationChannel(channel);
         }
 
+        // intent for play button
+        Intent pIntent = new Intent(this, MusicPlayerService.class);
+        pIntent.setAction(Constants.MUSIC_SERVICE_ACTION_PLAY);
+
+        PendingIntent playIntent = PendingIntent.getService(this, 100, pIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        // intent for pause button
+        Intent psIntent = new Intent(this, MusicPlayerService.class);
+        psIntent.setAction(Constants.MUSIC_SERVICE_ACTION_PAUSE);
+
+        PendingIntent pauseIntent = PendingIntent.getService(this, 100, psIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        // intent for stop button
+        Intent sIntent = new Intent(this, MusicPlayerService.class);
+        sIntent.setAction(Constants.MUSIC_SERVICE_ACTION_STOP);
+
+        PendingIntent stopIntent = PendingIntent.getService(this, 100, sIntent, PendingIntent.FLAG_IMMUTABLE);
+
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "channelId")
                 .setContentTitle("Dilip Music Player")
                 .setContentText("This is a demo music player")
-                .setSmallIcon(R.mipmap.ic_launcher);
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_play, "Play", playIntent))
+                .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_pause, "Pause", pauseIntent))
+                .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_ff, "Stop", stopIntent));
 
         // Start the service in the foreground
         startForeground(123, builder.build());
@@ -120,9 +158,5 @@ public class MusicPlayerService extends Service {
     public void pause() {
         mPlayer.pause();
     }
-
-//    public String getValue() {
-//        return "data from service";
-//    }
 }
 
