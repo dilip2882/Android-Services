@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">JobSchedular</string>
+    <string name="clear">CANCEL SERVICE</string>
+    <string name="run_code">SCHEDULE SERVICE</string>
+</resources>
