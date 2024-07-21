@@ -10,6 +10,8 @@ MusicPlayerService
 
 MusicPlayerForegroundService
 
+ForegroundService
+
 LocalBroadcastReceiver
 
 ResultReceiver
